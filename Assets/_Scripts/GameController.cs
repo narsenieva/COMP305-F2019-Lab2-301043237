@@ -1,10 +1,15 @@
-﻿using System.Collections;
+﻿/* 
+ * Student Name: Nataliia Arsenieva
+ * Student Number: 301043237
+ */
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
-
+using System.Linq; 
 
 public class GameController : MonoBehaviour
 {
@@ -40,6 +45,12 @@ public class GameController : MonoBehaviour
     [Header("Game Settings")]
     public ScoreBoard scoreBoard;
 
+    [Header("Scene Settings")]
+    public SceneSettings activeSceneSettings;
+    public List<SceneSettings> sceneSettings;
+    
+
+
     // public properties
     public int Lives
     {
@@ -51,6 +62,7 @@ public class GameController : MonoBehaviour
         set
         {
             _lives = value;
+            scoreBoard.lives = _lives;
             if(_lives < 1)
             {
                 
@@ -74,6 +86,7 @@ public class GameController : MonoBehaviour
         set
         {
             _score = value;
+            scoreBoard.score = _score;
 
 
             if (scoreBoard.highScore < _score)
@@ -103,37 +116,37 @@ public class GameController : MonoBehaviour
 
     private void SceneConfiguration()
     {
-        switch (SceneManager.GetActiveScene().name)
+        // compares the settings of the 
+        var query = from settings in sceneSettings
+                    where settings.scene == (Scene)Enum.Parse(typeof(Scene),
+                                            SceneManager.GetActiveScene().name.ToUpper())
+                    select settings;
+
+        activeSceneSettings = query.ToList().First();
+
         {
-            case "Start":
-                scoreLabel.enabled = false;
-                livesLabel.enabled = false;
-                highScoreLabel.enabled = false;
-                endLabel.SetActive(false);
-                restartButton.SetActive(false);
-                activeSoundClip = SoundClip.NONE;
-                break;
-            case "Main":
-                highScoreLabel.enabled = false;
-                startLabel.SetActive(false);
-                startButton.SetActive(false);
-                endLabel.SetActive(false);
-                restartButton.SetActive(false);
-                activeSoundClip = SoundClip.ENGINE;
-                break;
-            case "End":
-                scoreLabel.enabled = false;
-                livesLabel.enabled = false;
-                startLabel.SetActive(false);
-                startButton.SetActive(false);
-                activeSoundClip = SoundClip.NONE;
-                highScoreLabel.text = "High Score: " + scoreBoard.highScore;
-                break;
+            //checks if the main scene is active and sets up inital lives and score
+            if(activeSceneSettings.scene == Scene.MAIN)
+            {
+                Lives = 5;
+                Score = 0;
+            }
+
+            //applies all scene settings from the scriptable object
+            activeSoundClip = activeSceneSettings.activeSoundClip;
+            scoreLabel.enabled = activeSceneSettings.scoreLabelEnabled;
+            livesLabel.enabled = activeSceneSettings.livesLabelEnabled;
+            highScoreLabel.enabled = activeSceneSettings.highScoreLabelEnabled;
+            startLabel.SetActive(activeSceneSettings.startLabelActive);
+            endLabel.SetActive(activeSceneSettings.endLabelActive);
+            startButton.SetActive(activeSceneSettings.startButtonActive);
+            restartButton.SetActive(activeSceneSettings.restartButtonActive);
+
+            //assigns text values to labels from the scoreboard
+            livesLabel.text = "Lives: " + scoreBoard.lives;
+            scoreLabel.text = "Score: " + scoreBoard.score;
+            highScoreLabel.text = "High Score: " + scoreBoard.highScore;
         }
-
-        Lives = 5;
-        Score = 0;
-
 
         if ((activeSoundClip != SoundClip.NONE) && (activeSoundClip != SoundClip.NUM_OF_CLIPS))
         {
@@ -144,8 +157,6 @@ public class GameController : MonoBehaviour
             activeAudioSource.Play();
         }
 
-
-
         // creates an empty container (list) of type GameObject
         clouds = new List<GameObject>();
 
@@ -155,12 +166,6 @@ public class GameController : MonoBehaviour
         }
 
         Instantiate(island);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     // Event Handlers

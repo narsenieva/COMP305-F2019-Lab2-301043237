@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿/* 
+ * Student Name: Nataliia Arsenieva
+ * Student Number: 301043237
+ */
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +11,7 @@ using UnityEngine;
 public class SceneSettings : ScriptableObject
 {
     [Header("Scene Configuration")]
+    public Scene scene;
     public SoundClip activeSoundClip = SoundClip.NONE;
 
     [Header("Scoreboard Labels")]

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4e87938d6f3d164b90b804b7ef76a35, type: 3}
   m_Name: EndSceneSettings
   m_EditorClassIdentifier: 
+  scene: 2
   activeSoundClip: -1
-  scoreLabelEnabled: 0
+  scoreLabelEnabled: 1
   livesLabelEnabled: 0
   highScoreLabelEnabled: 1
   startLabelActive: 0
